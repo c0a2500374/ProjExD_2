@@ -4,9 +4,10 @@ import pygame as pg
 import random
 import time
 
-WIDTH, HEIGHT = 1100, 650
 
+WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 #課題１
 def game_over(screen: pg.Surface) -> None:
     
@@ -27,8 +28,6 @@ def game_over(screen: pg.Surface) -> None:
     kk_img8_2 = pg.transform.rotozoom(kk_img8_2, 0, 0.9)
     screen.blit(kk_img8_1, [WIDTH/2-150, HEIGHT/2])
     screen.blit(kk_img8_2, [WIDTH/2+220, HEIGHT/2])
-    
-    
 
     font = pg.font.Font(None, 80)
     txt = font.render("Game Over", True, (255, 255, 255))
@@ -38,7 +37,20 @@ def game_over(screen: pg.Surface) -> None:
     time.sleep(5)
 
 #課題2
-def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    引数：爆弾Surfaceのリストと加速度のリスト
+    戻り値：横方向・縦方向の真理値タプル
+    """
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_imgs.append(bb_img)
+        bb_img.set_colorkey((0, 0, 0))
+
+    bb_accs = [a for a in range(1,11)]
+    return bb_imgs, bb_accs
 
 
 def check_bound(rect: pg.Rect) ->tuple[bool, bool]:
@@ -67,13 +79,21 @@ def main():
               pg.K_DOWN:(0,5),
               pg.K_RIGHT:(5,0),
               pg.K_LEFT:(-5,0),}
+    """"
     bb_img = pg.Surface((20,20))
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
     bb_img.set_colorkey((0, 0, 0))
+    """
+    #新たな爆弾
+    bb_imgs, bb_accs = init_bb_imgs()
+    bb_img = bb_imgs[min(tmr//500, 9)]
+
     bb_rct = bb_img.get_rect()
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
     vx, vy =+5, +5
+    
+    
     
     while True:
         for event in pg.event.get():
@@ -85,29 +105,33 @@ def main():
             screen=game_over(screen)
             return
             
-
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-
 
         for i, tpl in move_jisyo.items():
             if key_lst[i]:
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
 
-
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], sum_mv[1])
-        
-        bb_rct.move_ip(vx,vy)
-        yoko,tate = check_bound(bb_rct) 
-        if not yoko:
-            vx*=-1
-        if not tate:
-            vy*=-1
-           
 
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
+        bb_rct.move_ip(avx,avy)
+
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:
+            vx *= -1
+            bb_rct.move_ip(-avx, 0)
+        if not tate:
+            vy *= -1
+            bb_rct.move_ip(0, -avy)
+           
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
