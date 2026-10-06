@@ -2,11 +2,43 @@ import os
 import sys
 import pygame as pg
 import random
-
+import time
 
 WIDTH, HEIGHT = 1100, 650
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+#課題１
+def game_over(screen: pg.Surface) -> None:
+    
+    """
+    ゲームオーバー画面を表示する関数
+    引数：画面Surface
+    戻り値：なし
+    """
+
+    black = pg.Surface((WIDTH, HEIGHT))
+    black.set_alpha(200)
+    black.fill((0, 0, 0))
+    screen.blit(black, (0, 0))
+
+    kk_img8_1 = pg.image.load("fig/8.png")
+    kk_img8_1 = pg.transform.rotozoom(kk_img8_1, 0, 0.9)
+    kk_img8_2 = pg.image.load("fig/8.png")
+    kk_img8_2 = pg.transform.rotozoom(kk_img8_2, 0, 0.9)
+    screen.blit(kk_img8_1, [WIDTH/2-150, HEIGHT/2])
+    screen.blit(kk_img8_2, [WIDTH/2+220, HEIGHT/2])
+    
+    
+
+    font = pg.font.Font(None, 80)
+    txt = font.render("Game Over", True, (255, 255, 255))
+    screen.blit(txt, [WIDTH/2-100, HEIGHT/2])
+
+    pg.display.update()
+    time.sleep(5)
+
+#課題2
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]
 
 
 def check_bound(rect: pg.Rect) ->tuple[bool, bool]:
@@ -42,7 +74,7 @@ def main():
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
     vx, vy =+5, +5
-
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -50,7 +82,9 @@ def main():
         screen.blit(bg_img, [0, 0]) 
         if kk_rct.colliderect(bb_rct):
             print("\n    GAME OVER\n")
+            screen=game_over(screen)
             return
+            
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
