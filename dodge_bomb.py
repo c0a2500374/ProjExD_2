@@ -26,9 +26,9 @@ def main():
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
-    bb_rct_centerx = random.randint(0, WIDTH)
-    bb_rct_centery = random.randint(0, HEIGHT)
-    vx, vy +=5
+    bb_rct.centerx = random.randint(0, WIDTH)
+    bb_rct.centery = random.randint(0, HEIGHT)
+    vx, vy =+5, +5
 
     while True:
         for event in pg.event.get():
